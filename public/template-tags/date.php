@@ -57,7 +57,7 @@ if( class_exists( 'TribeEvents' ) ) {
 	 * @todo support $postId for recurring events.
 	 * @since 2.0
 	 */
-	function tribe_get_end_date( $postId = null, $displayTime = 'true', $dateFormat = '' )  {
+	function tribe_get_end_date( $postId = null, $displayTime = 'true', $dateFormat = '', $displayDate = true )  {
 		$postId = TribeEvents::postIdHelper( $postId );
 		if (!$postId || ( function_exists('tribe_is_recurring_event') && tribe_is_recurring_event( $postId ) ) ) {
 			global $post;
@@ -77,7 +77,7 @@ if( class_exists( 'TribeEvents' ) ) {
 			return; // '&mdash;';
 		}
 
-		return tribe_event_format_date($date, $displayTime, $dateFormat );
+		return tribe_event_format_date($date, $displayTime, $dateFormat, $displayDate );
 	}
 
 	/**
@@ -91,11 +91,12 @@ if( class_exists( 'TribeEvents' ) ) {
 	 * @return string
 	 * @since 2.0
 	 */
-	function tribe_event_format_date($date, $displayTime = true,  $dateFormat = '')  {
+	function tribe_event_format_date($date, $displayTime = true,  $dateFormat = '', $displayDate = true)  {
 		$tribe_ecp = TribeEvents::instance();
 		
-		if( $dateFormat ) $format = $dateFormat;
-		else $format = get_option( 'date_format', TribeDateUtils::DATEONLYFORMAT );
+		if( $displayDate )
+				if( $dateFormat ) $format = $dateFormat;
+				else $format = get_option( 'date_format', TribeDateUtils::DATEONLYFORMAT );
 
 		if ( $displayTime )
 			$format = $tribe_ecp->getTimeFormat( $format );
