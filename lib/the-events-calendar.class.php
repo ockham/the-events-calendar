@@ -1570,10 +1570,10 @@ if ( !class_exists( 'TribeEvents' ) ) {
 						$month = add_query_arg( array( 'eventDate' => $secondary ), $month );
 					return $month;
 				case 'day':
-					$month = add_query_arg( array( 'eventDisplay' => 'day'), $eventUrl );
+					$day = add_query_arg( array( 'eventDisplay' => 'day'), $eventUrl );
 					if ( $secondary )
-						$month = add_query_arg( array( 'eventDate' => $secondary ), $month );
-					return $month;
+						$day = add_query_arg( array( 'eventDate' => $secondary ), $day );
+					return $day;
 				case 'upcoming':
 					return add_query_arg( array( 'eventDisplay' => 'upcoming'), $eventUrl );
 				case 'past':
