@@ -137,6 +137,11 @@ if( class_exists( 'TribeEvents' ) ) {
 			$cat = get_term_by( 'slug', get_query_var('term'), $tribe_ecp->get_event_taxonomy() );
 			if ( $depth ) {
 				$title = '<a href="'.tribe_get_events_link().'">'.$title.'</a>';
+				$ancestors = get_ancestors( $cat->term_id, $tribe_ecp->get_event_taxonomy() );
+				foreach ($ancestors as $ancestor_id) {
+					$ancestor = get_term_by( 'id', $ancestor_id, $tribe_ecp->get_event_taxonomy() );
+					$title .= ' &#8250; <a href="'.get_term_link( $ancestor_id, $tribe_ecp->get_event_taxonomy() ).'vergangen">'.$ancestor->name.'</a>';
+				}
 				$title .= ' &#8250; ' . $cat->name;
 			} else {
 				$title = $cat->name;
