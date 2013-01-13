@@ -159,6 +159,11 @@ if( class_exists( 'TribeEvents' ) ) {
 				$title = $cat->name;
 			}
 		}
+		elseif ( $tribe_ecp->displaying == 'day' ) {
+			$day = date_i18n('d. F Y', strtotime(get_query_var('eventDate')));
+			$title = '<a href="'.tribe_get_events_link().'">'.$title.'</a>';
+			$title .= ' &#8250; ' . $day;
+		}
 		elseif ( $tribe_ecp->displaying == 'year' ) {
 			$year = date_i18n('Y', strtotime(get_query_var('eventDate')));
 			$title = '<a href="'.tribe_get_events_link().'">'.$title.'</a>';
