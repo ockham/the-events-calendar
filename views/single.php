@@ -106,7 +106,16 @@ if ( !defined('ABSPATH') ) { die('-1'); }
    <a href="<?php echo tribe_get_gcal_link(); ?>" class="gcal-add" title="<?php _e('Add to Google Calendar', 'tribe-events-calendar'); ?>"><?php _e('+ Google Calendar', 'tribe-events-calendar'); ?></a>
 <?php endif; ?>
 
+<?php
+global $post;
+$tribe_ecp = TribeEvents::instance();
+if ($tribe_ecp->get_event_link($post,'previous',$anchor) != "") {
+?>
 <div class="navlink tribe-previous"><?php tribe_previous_event_link(); ?></div>
-
+<?php }
+if ($tribe_ecp->get_event_link($post,'next',$anchor) != "") {
+?>
 <div class="navlink tribe-next"><?php tribe_next_event_link(); ?></div>
+<?php } ?>
+
 <div style="clear:both"></div>
