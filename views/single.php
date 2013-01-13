@@ -9,7 +9,7 @@
 // Don't load directly
 if ( !defined('ABSPATH') ) { die('-1'); }
 ?>
-<span class="back"><a href="<?php echo tribe_get_events_link(); ?>"><?php _e('&laquo; Back to Events', 'tribe-events-calendar'); ?></a></span>				
+<span class="back"><a href="<?php echo tribe_get_events_link(); ?>"><?php _e('&laquo; Back to Events', 'tribe-events-calendar'); ?></a> &raquo; <a href="<?php echo tribe_get_events_link() . tribe_get_start_date(get_the_ID(), false, 'Y'); ?>"><?php echo tribe_get_start_date(get_the_ID(), false, 'Y'); ?></a></span>
 <?php
 	$gmt_offset = (get_option('gmt_offset') >= '0' ) ? ' +' . get_option('gmt_offset') : " " . get_option('gmt_offset');
  	$gmt_offset = str_replace( array( '.25', '.5', '.75' ), array( ':15', ':30', ':45' ), $gmt_offset );
