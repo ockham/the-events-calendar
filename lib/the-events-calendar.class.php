@@ -65,6 +65,7 @@ if ( !class_exists( 'TribeEvents' ) ) {
 		protected $taxRewriteSlug = 'event/category';
 		protected $tagRewriteSlug = 'event/tag';
 		protected $monthSlug = 'month';
+		protected $yearSlug = 'year';
 		protected $pastSlug = 'past';
 		protected $upcomingSlug = 'upcoming';
 		protected $postExceptionThrown = false;
@@ -299,6 +300,7 @@ if ( !class_exists( 'TribeEvents' ) ) {
 			$this->taxRewriteSlug = $this->rewriteSlug . '/' . sanitize_title(__( 'category', 'tribe-events-calendar' ));
 			$this->tagRewriteSlug = $this->rewriteSlug . '/' . sanitize_title(__( 'tag', 'tribe-events-calendar' ));
 			$this->monthSlug = sanitize_title(__('month', 'tribe-events-calendar'));
+			$this->yearSlug = sanitize_title(__('year', 'tribe-events-calendar'));
 			$this->upcomingSlug = sanitize_title(__('upcoming', 'tribe-events-calendar'));
 			$this->pastSlug = sanitize_title(__('past', 'tribe-events-calendar'));
 			$this->postTypeArgs['rewrite']['slug'] = sanitize_title($this->rewriteSlugSingular);
@@ -660,6 +662,10 @@ if ( !class_exists( 'TribeEvents' ) ) {
 			} elseif(get_query_var('eventDisplay') == 'day') {
 				$title_date = date_i18n("F d, Y",strtotime(get_query_var('eventDate')));
 				$new_title = apply_filters( 'tribe_events_day_view_title', sprintf(__("Events for %s", 'tribe-events-calendar'), $title_date) . ' '. $sep . ' ' . $title, $sep, $title_date );
+
+			} elseif(get_query_var('eventDisplay') == 'year') {
+				$title_date = date_i18n("Y",strtotime(get_query_var('eventDate')));
+				$new_title = apply_filters( 'tribe_events_year_view_title', sprintf(__("Events for %s", 'tribe-events-calendar'), $title_date) . ' '. $sep . ' ' . $title, $sep, $title_date );
          } elseif(get_query_var('post_type') == self::POSTTYPE && is_single() && $this->getOption('tribeEventsTemplate') != '' ) {
 				global $post;
 				$new_title = $post->post_title . ' '. $sep . ' ' . $title;
@@ -1294,11 +1300,16 @@ if ( !class_exists( 'TribeEvents' ) ) {
 		public function setDate($query) {
 			if ( $query->get('eventDisplay') == 'month' ) {
 				$this->date = $query->get('eventDate') . "-01";
+			} else if ( $query->get('eventDisplay') == 'year' ) {
+				$this->date = $query->get('eventDate') . "-01-01";
 			} else if ( $query->get('eventDate') ) {
 				$this->date = $query->get('eventDate');
 			} else if ( $query->get('eventDisplay') == 'month' ) {
 				$date = date_i18n( TribeDateUtils::DBDATEFORMAT );
 				$this->date = substr_replace( $date, '01', -2 );
+			} else if ( $query->get('eventDisplay') == 'year' ) {
+				$date = date_i18n( TribeDateUtils::DBDATEFORMAT );
+				$this->date = substr_replace( $date, '01-01', -5 );
 			} else if (is_singular() && $query->get('eventDate') ) {
 				$this->date = $query->get('eventDate');
 			} else if (!is_singular()) { // don't set date for single event unless recurring
@@ -1323,6 +1334,7 @@ if ( !class_exists( 'TribeEvents' ) ) {
 				!tribe_is_upcoming() && 
 				!tribe_is_past() && 
 				!tribe_is_month() && 
+				!tribe_is_year() &&
 				!tribe_is_by_date() ) {
 
 				$startTime = get_post_meta($post->ID, '_EventStartDate', true);
@@ -1444,6 +1456,7 @@ if ( !class_exists( 'TribeEvents' ) ) {
 			$baseTag = "(.*)" . $baseTag;
 	
 			$month = $this->monthSlug;
+			$year = $this->yearSlug;
 			$upcoming = $this->upcomingSlug;
 			$past = $this->pastSlug;
 			$newRules = array();
@@ -1461,6 +1474,7 @@ if ( !class_exists( 'TribeEvents' ) ) {
 			$newRules[$base . $upcoming] = 'index.php?post_type=' . self::POSTTYPE . '&eventDisplay=upcoming';
 			$newRules[$base . $past . '/page/(\d+)'] = 'index.php?post_type=' . self::POSTTYPE . '&eventDisplay=past&paged=' . $wp_rewrite->preg_index(1);
 			$newRules[$base . $past] = 'index.php?post_type=' . self::POSTTYPE . '&eventDisplay=past';
+			$newRules[$base . '(\d{4})$'] = 'index.php?post_type=' . self::POSTTYPE . '&eventDisplay=year' .'&eventDate=' . $wp_rewrite->preg_index(1);
 			$newRules[$base . '(\d{4}-\d{2})$'] = 'index.php?post_type=' . self::POSTTYPE . '&eventDisplay=month' .'&eventDate=' . $wp_rewrite->preg_index(1);
 			$newRules[$base . '(\d{4}-\d{2}-\d{2})$'] = 'index.php?post_type=' . self::POSTTYPE . '&eventDisplay=day' .'&eventDate=' . $wp_rewrite->preg_index(1);
 			$newRules[$base . 'feed/?$'] = 'index.php?eventDisplay=upcoming&post_type=' . self::POSTTYPE . '&feed=rss2';
@@ -1520,6 +1534,11 @@ if ( !class_exists( 'TribeEvents' ) ) {
 						return trailingslashit( esc_url($eventUrl . $secondary) );
 					}
 					return trailingslashit( esc_url($eventUrl . $this->monthSlug) );
+				case 'year':
+					if ( $secondary ) {
+						return trailingslashit( esc_url($eventUrl . $secondary) );
+					}
+					return trailingslashit( esc_url($eventUrl . $this->yearSlug) );
 				case 'upcoming':
 					return trailingslashit( esc_url($eventUrl . $this->upcomingSlug) );
 				case 'past':
@@ -1564,6 +1583,11 @@ if ( !class_exists( 'TribeEvents' ) ) {
 		
 				case 'home':
 					return $eventUrl;
+				case 'year':
+					$year = add_query_arg( array( 'eventDisplay' => 'year'), $eventUrl );
+					if ( $secondary )
+						$year = add_query_arg( array( 'eventDate' => $secondary ), $year );
+					return $year;
 				case 'month':
 					$month = add_query_arg( array( 'eventDisplay' => 'month'), $eventUrl );
 					if ( $secondary )
@@ -2452,6 +2476,27 @@ if ( !class_exists( 'TribeEvents' ) ) {
 			$return =	$dateParts[0] . '-' . $dateParts[1];
 
 			return $return;
+		}
+
+		/**
+		 * Given a date (YYYY-MM-DD), returns the first of the next year
+		 *
+		 * @param date
+		 * @return date
+		 */
+		public function nextYear( $date ) {
+			$dateParts = split( '-', $date );
+			return ++$dateParts[0] . '-01-01';
+		}
+		/**
+		 * Given a date (YYYY-MM-DD), return the first of the previous year
+		 *
+		 * @param date
+		 * @return date
+		 */
+		public function previousYear( $date ) {
+			$dateParts = split( '-', $date );
+			return --$dateParts[0] . '-01-01';
 		}
 
 		/**

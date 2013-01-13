@@ -84,6 +84,9 @@ if (!class_exists('TribeEventsQuery')) {
                   		break;				
                		case "month":
                   		$query = self::setMonthDisplayTypeArgs($query);				
+                  		break;
+               		case "year":
+                  		$query = self::setYearDisplayTypeArgs($query);
             	}
          	} else if ( is_single() ) {
 				$args = &$query->query_vars;
@@ -185,6 +188,27 @@ if (!class_exists('TribeEventsQuery')) {
 			$args['order'] = "ASC";
 		
 			return $query;		
+		}
+
+		// year functions
+		public static function setYearDisplayTypeArgs($query) {
+			global $wp_query;
+			$tribe_ecp = TribeEvents::instance();
+			$args = &$query->query_vars;
+
+			$args['posts_per_page'] = -1; // show ALL month posts
+			$args['start_date'] = date_i18n( TribeDateUtils::DBDATEFORMAT );
+			$args['start_date'] = substr_replace( $args['start_date'], '01-01', -5 );
+
+			if ( isset ( $wp_query->query_vars['eventDate'] ) )
+				$args['start_date'] = $wp_query->query_vars['eventDate'] . "-01-01";
+
+			$args['eventDate'] = $args['start_date'];
+			$args['end_date'] = date( 'Y-m-d', strtotime( $tribe_ecp->nextYear($args['start_date']) ) -(24*3600) );
+			$args['orderby'] = 'event_date';
+			$args['order'] = "DESC";
+
+			return $query;
 		}
 
 		public static function addEventConditions($where, $cur_query) {

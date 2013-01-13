@@ -12,7 +12,7 @@ if ( !defined('ABSPATH') ) { die('-1'); }
 ?>
 <div id="tribe-events-content" class="upcoming">
 
-	<?php if(!tribe_is_day()): // day view doesn't have a grid ?>
+	<?php if(!tribe_is_day() && !tribe_is_year()): // day and year views don't have a grid ?>
 		<div id='tribe-events-calendar-header' class="clearfix">
 		<span class='tribe-events-calendar-buttons'> 
 			<a class='tribe-events-button-on' href='<?php echo tribe_get_listview_link(); ?>'><?php _e('Event List', 'tribe-events-calendar'); ?></a>
@@ -48,7 +48,7 @@ if ( !defined('ABSPATH') ) { die('-1'); }
 
 			<div class="tribe-events-event-list-meta" itemprop="location" itemscope itemtype="http://schema.org/Place">
 				<table cellspacing="0">
-					<?php if (tribe_is_multiday() || !tribe_get_all_day()): ?>
+					<?php if (tribe_is_multiday() || (!tribe_get_all_day() && (tribe_get_start_date() !== tribe_get_end_date()))): ?>
 					<tr>
 						<td class="tribe-events-event-meta-desc"><?php _e('Start:', 'tribe-events-calendar'); ?></td>
 						<td class="tribe-events-event-meta-value" itemprop="startDate" content="<?php echo tribe_get_start_date(); ?>"><?php echo tribe_get_start_date(); ?></td>
@@ -127,6 +127,10 @@ if ( !defined('ABSPATH') ) { die('-1'); }
 			<?php printf( __('No events scheduled for <strong>%s</strong>. Please try another day.', 'tribe-events-calendar'), date_i18n('F d, Y', strtotime(get_query_var('eventDate')))); ?>
 		<?php endif; ?>
 
+		<?php if(tribe_is_year()): ?>
+			<?php printf( __('No events scheduled for <strong>%s</strong>. Please try another year.', 'tribe-events-calendar'), date_i18n('Y', strtotime(get_query_var('eventDate')))); ?>
+		<?php endif; ?>
+
 		<?php if(tribe_is_upcoming()){ ?>
 			<?php _e('No upcoming events', 'tribe-events-calendar');
 			echo !empty($is_cat_message) ? $is_cat_message : "."; ?>
@@ -144,7 +148,9 @@ if ( !defined('ABSPATH') ) { die('-1'); }
 
 		<div class="tribe-events-nav-previous"><?php 
 		// Display Previous Page Navigation
-		if( tribe_is_upcoming() && get_previous_posts_link() ) : ?>
+		if( tribe_is_year() ): ?>
+			<span><a href='<?php echo tribe_get_previous_year_link(); ?>'><?php echo tribe_get_previous_year(); ?></a></span>
+		<?php elseif( tribe_is_upcoming() && get_previous_posts_link() ) : ?>
 			<?php previous_posts_link( '<span>'.__('&laquo; Previous Events', 'tribe-events-calendar').'</span>' ); ?>
 		<?php elseif( tribe_is_upcoming() && !get_previous_posts_link( ) ) : ?>
 			<a href='<?php echo tribe_get_past_link(); ?>'><span><?php _e('&laquo; Previous Events', 'tribe-events-calendar' ); ?></span></a>
@@ -155,7 +161,9 @@ if ( !defined('ABSPATH') ) { die('-1'); }
 
 		<div class="tribe-events-nav-next"><?php
 		// Display Next Page Navigation
-		if( tribe_is_upcoming() && get_next_posts_link( ) ) : ?>
+		if( tribe_is_year() ): ?>
+			<span><a href='<?php echo tribe_get_next_year_link(); ?>'><?php echo tribe_get_next_year(); ?></a></span>
+		<?php elseif( tribe_is_upcoming() && get_next_posts_link( ) ) : ?>
 			<?php next_posts_link( '<span>'.__('Next Events &raquo;', 'tribe-events-calendar').'</span>' ); ?>
 		<?php elseif( tribe_is_past() && get_previous_posts_link( ) ) : ?>
 			<?php previous_posts_link( '<span>'.__('Next Events &raquo;', 'tribe-events-calendar').'</span>' ); // a little confusing but in 'past view' to see newer events you want the previous page ?>

@@ -50,6 +50,18 @@ if( class_exists( 'TribeEvents' ) ) {
 		return ($tribe_ecp->displaying == 'day') ? true : false;
 	}
 
+	/**
+	 * Single Year Test
+	 *
+	 * Returns true if the query is set for single year, false otherwise
+	 *
+	 * @return bool
+	 * @since 2.0
+	 */
+	function tribe_is_year()  {
+		$tribe_ecp = TribeEvents::instance();
+		return ($tribe_ecp->displaying == 'year') ? true : false;
+	}
 
 	/**
 	 * Past Loop View Test
@@ -147,6 +159,11 @@ if( class_exists( 'TribeEvents' ) ) {
 				$title = $cat->name;
 			}
 		}
+		elseif ( $tribe_ecp->displaying == 'year' ) {
+			$year = date_i18n('Y', strtotime(get_query_var('eventDate')));
+			$title = '<a href="'.tribe_get_events_link().'">'.$title.'</a>';
+			$title .= ' &#8250; ' . $year;
+		}
 
 		return apply_filters('tribe_get_events_title', $title);
 	}
@@ -178,6 +195,81 @@ if( class_exists( 'TribeEvents' ) ) {
 		$output = $tribe_ecp->getLink('past');
 		return $output;
 	}
+
+	/**
+	 * Link to a given Year
+	 *
+	 * Returns a link to the previous events in list view. Used in the loop view.
+	 *
+	 * @return string URL
+	 * @since 2.0
+	 */
+	function tribe_get_year_link($year)  {
+		$tribe_ecp = TribeEvents::instance();
+		$output = $tribe_ecp->getLink('year',$year);
+		return $output;
+	}
+
+	/**
+	 * Return the next year
+	 *
+	 * On year list view page, returns the next year. Used in the loop view.
+	 *
+	 * @return int Next year
+	 * @since 2.0
+	 */
+	function tribe_get_next_year() {
+		return tribe_get_year() + 1;
+	}
+
+	/**
+	 * Return the previous year
+	 *
+	 * On year list view page, returns the previous year. Used in the loop view.
+	 *
+	 * @return int Previous year
+	 * @since 2.0
+	 */
+	function tribe_get_previous_year() {
+		return tribe_get_year() - 1;
+	}
+
+	/**
+	 * Return the current year
+	 *
+	 * On year list view page, returns the current year. Used in the loop view.
+	 *
+	 * @return int Current year
+	 * @since 2.0
+	 */
+	function tribe_get_year() {
+		return date_i18n('Y', strtotime(get_query_var('eventDate')));
+	}
+
+	/**
+	 * Link to the next Year
+	 *
+	 * Returns a link to the next year in list view. Used in the loop view.
+	 *
+	 * @return string URL
+	 * @since 2.0
+	 */
+	function tribe_get_next_year_link()  {
+		return tribe_get_year_link(tribe_get_next_year());
+	}
+
+	/**
+	 * Link to the previous Year
+	 *
+	 * Returns a link to the previous year in list view. Used in the loop view.
+	 *
+	 * @return string URL
+	 * @since 2.0
+	 */
+	function tribe_get_previous_year_link()  {
+		return tribe_get_year_link(tribe_get_previous_year());
+	}
+
 
 }
 ?>
