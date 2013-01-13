@@ -54,6 +54,9 @@ ob_end_clean();
 			if( $event->AllDay ) {
 				echo ' <small><em>('.__('All Day','tribe-events-calendar').')</em></small>';
          	}
+		else {
+			echo " Uhr";
+		}
       ?> 
 	</div>
 	<div class="event">
