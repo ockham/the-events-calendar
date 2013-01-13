@@ -2576,7 +2576,7 @@ if ( !class_exists( 'TribeEvents' ) ) {
 					$anchor = preg_replace( '|%title%|', $results->post_title, $anchor );
 				}
 
-				echo '<a href='.tribe_get_event_link($results).'>'.$anchor.'</a>';
+				return '<a href='.tribe_get_event_link($results).'>'.$anchor.'</a>';
 		
 			}
 		}
