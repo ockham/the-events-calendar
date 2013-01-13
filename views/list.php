@@ -112,6 +112,7 @@ if ( !defined('ABSPATH') ) { die('-1'); }
 					 </tr>
 					<?php endif; ?>
 				</table>
+				<?php edit_post_link(__('Edit','tribe-events-calendar'), '<span class="edit-link">', '</span>'); ?>
 			</div>
 		</div> <!-- End post -->
 	<?php endwhile;// posts ?>
